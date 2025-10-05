@@ -1,8 +1,7 @@
 import express from 'express';
 import { handlerReadiness } from './api/readiness.js';
-import { middlewareLogResponse } from './middlewares/middleware-log-responses.js';
-import { middlewareMetricInc } from './middlewares/middleware-metrics-inc.js';
 import { handlerApiMetrics, handlerResetApiMetrics } from './api/metrics.js';
+import { middlewareLogResponse, middlewareMetricInc } from './api/middleware.js';
 
 const app = express();
 const PORT = 8080;
@@ -10,9 +9,9 @@ const PORT = 8080;
 app.use(middlewareLogResponse);
 app.use('/app', middlewareMetricInc, express.static('./src/app'));
 
-app.get('/healthz', handlerReadiness);
-app.get('/metrics', handlerApiMetrics);
-app.get('/reset', handlerResetApiMetrics);
+app.get('/api/healthz', handlerReadiness);
+app.get('/admin/metrics', handlerApiMetrics);
+app.get('/admin/reset', handlerResetApiMetrics);
 
 app.listen(PORT, () => {
   console.log(`Server is running at http://localhost:${PORT}`);
