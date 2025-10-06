@@ -1,5 +1,6 @@
 import { Request, Response } from 'express';
-import { respondWithError, respondWithJson } from './utils';
+import { respondWithJson } from './utils';
+import { BadRequestError } from './errors';
 
 const MAX_CHIRP_LENGTH = 140;
 type Chirp = {
@@ -9,12 +10,10 @@ type Chirp = {
 export async function handlerValidateChirp(req: Request, res: Response) {
   const reqBody: Chirp = req.body;
   if (!reqBody || !reqBody.body || typeof reqBody.body !== 'string') {
-    respondWithError(res, 400, 'Invalid Payload');
-    return;
+    throw new BadRequestError('Invalid Payload');
   }
   if (reqBody.body.length > MAX_CHIRP_LENGTH) {
-    respondWithError(res, 400, 'Chirp is too long');
-    return;
+    throw new BadRequestError('Chirp is too long. Max length is 140');
   }
 
   const words = reqBody.body.split(' ');
