@@ -7,35 +7,25 @@ type Chirp = {
 };
 
 export async function handlerValidateChirp(req: Request, res: Response) {
-  res.header('Content-Type', 'application/json');
-  let body = '';
-  let reqBody: Chirp;
-  req.on('data', (chunk) => {
-    body += chunk;
-  });
-
-  req.on('end', () => {
-    try {
-      reqBody = JSON.parse(body);
-      if (!reqBody || !reqBody.body || typeof reqBody.body !== 'string') {
-        respondWithError(res, 400, 'Invalid Payload');
-        return;
-      }
-    } catch (err) {
-      if (err instanceof Error) {
-      }
-      respondWithError(res, 500, 'Something went wrong');
-      return;
-    }
-
-    if (reqBody.body.length > MAX_CHIRP_LENGTH) {
-      respondWithError(res, 400, 'Chirp is too long');
-      return;
-    }
-    const resBody = {
-      valid: true,
-    };
-    respondWithJson(res, 200, resBody);
+  const reqBody: Chirp = req.body;
+  if (!reqBody || !reqBody.body || typeof reqBody.body !== 'string') {
+    respondWithError(res, 400, 'Invalid Payload');
     return;
-  });
+  }
+  if (reqBody.body.length > MAX_CHIRP_LENGTH) {
+    respondWithError(res, 400, 'Chirp is too long');
+    return;
+  }
+
+  const words = reqBody.body.split(' ');
+  const cleanedWords: string[] = [];
+  const profaneWords = new Set(['kerfuffle', 'sharbert', 'fornax']);
+
+  for (const word of words) {
+    const cleanedWord = profaneWords.has(word.toLowerCase()) ? '****' : word;
+    const suffix = cleanedWords.length > 0 ? ' ' : '';
+    cleanedWords.push(suffix + cleanedWord);
+  }
+  respondWithJson(res, 200, { cleanedBody: cleanedWords.join('') });
+  return;
 }
