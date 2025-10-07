@@ -13,7 +13,7 @@ export function middlewareLogResponse(req: Request, res: Response, next: NextFun
 }
 
 export function middlewareMetricInc(req: Request, res: Response, next: NextFunction) {
-  config.fileserverHits++;
+  config.api.fileserverHits++;
   next();
 }
 
