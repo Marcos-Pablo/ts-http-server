@@ -10,9 +10,3 @@ export async function handlerApiMetrics(req: Request, res: Response) {
   </body>
 </html>`);
 }
-
-export async function handlerResetApiMetrics(req: Request, res: Response) {
-  config.api.fileserverHits = 0;
-  res.write('Hits reset to 0');
-  res.end();
-}
