@@ -1,22 +1,44 @@
 import { Request, Response } from 'express';
 import { respondWithJson } from './utils';
 import { BadRequestError } from './errors';
+import { createChirp } from '../db/queries/chirps';
 
 const MAX_CHIRP_LENGTH = 140;
-type Chirp = {
+
+type Parameters = {
   body: string;
+  userId: string;
 };
 
-export async function handlerValidateChirp(req: Request, res: Response) {
-  const reqBody: Chirp = req.body;
-  if (!reqBody || !reqBody.body || typeof reqBody.body !== 'string') {
-    throw new BadRequestError('Invalid Payload');
+export async function handlerCreateChirp(req: Request, res: Response) {
+  const params: Parameters = req.body;
+
+  if (
+    !params ||
+    !params.body ||
+    typeof params.body !== 'string' ||
+    !params.userId ||
+    typeof params.userId !== 'string'
+  ) {
+    throw new BadRequestError('Invalid payload');
   }
-  if (reqBody.body.length > MAX_CHIRP_LENGTH) {
+  const cleaned = validateChirp(params.body);
+  const chirp = await createChirp({ body: cleaned, userId: params.userId });
+
+  if (!chirp) {
+    throw new Error('Could not create chirp');
+  }
+
+  respondWithJson(res, 201, chirp);
+  return;
+}
+
+function validateChirp(body: string) {
+  if (body.length > MAX_CHIRP_LENGTH) {
     throw new BadRequestError('Chirp is too long. Max length is 140');
   }
 
-  const words = reqBody.body.split(' ');
+  const words = body.split(' ');
   const cleanedWords: string[] = [];
   const profaneWords = new Set(['kerfuffle', 'sharbert', 'fornax']);
 
@@ -25,6 +47,6 @@ export async function handlerValidateChirp(req: Request, res: Response) {
     const suffix = cleanedWords.length > 0 ? ' ' : '';
     cleanedWords.push(suffix + cleanedWord);
   }
-  respondWithJson(res, 200, { cleanedBody: cleanedWords.join('') });
-  return;
+
+  return cleanedWords.join('');
 }
