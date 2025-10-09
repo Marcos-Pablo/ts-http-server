@@ -15,6 +15,13 @@
       "when": 1759888953837,
       "tag": "0001_classy_sally_floyd",
       "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1760028692246,
+      "tag": "0002_adorable_proudstar",
+      "breakpoints": true
     }
   ]
 }
