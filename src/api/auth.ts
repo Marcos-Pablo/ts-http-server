@@ -28,7 +28,7 @@ export async function handlerSignIn(req: Request, res: Response) {
   if (!user) {
     throw new UnauthorizedError('Incorrent email or password');
   }
-  const passwordMatches = await checkPasswordHash(user.hashedPassword, params.password);
+  const passwordMatches = await checkPasswordHash(params.password, user.hashedPassword);
   if (!passwordMatches) {
     throw new UnauthorizedError('Incorrent email or password');
   }
