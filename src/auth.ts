@@ -1,6 +1,7 @@
 import argon2 from 'argon2';
 import jwt, { JwtPayload } from 'jsonwebtoken';
-import { UnauthorizedError } from './api/errors';
+import { BadRequestError, UnauthorizedError } from './api/errors';
+import { Request } from 'express';
 
 type Payload = Pick<JwtPayload, 'iss' | 'sub' | 'iat' | 'exp'>;
 const TOKEN_ISSUER = 'chirpy';
@@ -17,6 +18,22 @@ export async function checkPasswordHash(password: string, hash: string): Promise
   } catch {
     return false;
   }
+}
+
+export function getBearerToken(req: Request): string {
+  const authHeader = req.get('Authorization');
+
+  if (!authHeader) {
+    throw new BadRequestError('Malformed authorization header');
+  }
+
+  const token = authHeader.trim().split(' ');
+
+  if (token.length != 2 || token[0] !== 'Bearer') {
+    throw new BadRequestError('Malformed authorization header');
+  }
+
+  return token[1];
 }
 
 export function makeJWT(userId: string, expiresIn: number, secret: string): string {

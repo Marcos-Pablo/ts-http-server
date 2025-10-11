@@ -3,6 +3,8 @@ import { respondWithJson } from './utils';
 import { BadRequestError, NotFoundError } from './errors';
 import { createChirp, getChirpById, getChirps } from '../db/queries/chirps';
 import { NewChirp } from '../db/schema';
+import { getBearerToken, validateJWT } from 'src/auth';
+import { config } from 'src/config';
 
 const MAX_CHIRP_LENGTH = 140;
 
@@ -31,19 +33,15 @@ export async function handlerGetChirpById(req: Request, res: Response) {
 }
 
 export async function handlerCreateChirp(req: Request, res: Response) {
-  const params = req.body as Pick<NewChirp, 'body' | 'userId'>;
+  const params = req.body as Pick<NewChirp, 'body'>;
+  const bearerToken = getBearerToken(req);
+  const tokenSubject = validateJWT(bearerToken, config.jwt.secret);
 
-  if (
-    !params ||
-    !params.body ||
-    typeof params.body !== 'string' ||
-    !params.userId ||
-    typeof params.userId !== 'string'
-  ) {
+  if (!params || !params.body || typeof params.body !== 'string') {
     throw new BadRequestError('Invalid payload');
   }
   const cleaned = validateChirp(params.body);
-  const chirp = await createChirp({ body: cleaned, userId: params.userId });
+  const chirp = await createChirp({ body: cleaned, userId: tokenSubject });
 
   if (!chirp) {
     throw new Error('Could not create chirp');

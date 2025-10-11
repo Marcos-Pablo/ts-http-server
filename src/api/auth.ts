@@ -2,15 +2,17 @@ import { Request, Response } from 'express';
 import { BadRequestError, UnauthorizedError } from './errors';
 import { getUserByEmail } from '../db/queries/users';
 import { respondWithJson } from './utils';
-import { checkPasswordHash } from '../auth';
+import { checkPasswordHash, makeJWT } from '../auth';
 import { User } from '../db/schema';
+import { config } from 'src/config';
 
 type AuthParams = {
   email: string;
   password: string;
+  expiresInSecond?: number;
 };
 
-type SignInResponse = Omit<User, 'hashedPassword'>;
+type SignInResponse = Omit<User, 'hashedPassword'> & { token: string };
 
 export async function handlerSignIn(req: Request, res: Response) {
   const params = req.body as AuthParams;
@@ -33,11 +35,24 @@ export async function handlerSignIn(req: Request, res: Response) {
     throw new UnauthorizedError('Incorrent email or password');
   }
 
+  let expiresInSecond = config.jwt.defaultDuration;
+  if (
+    params.expiresInSecond &&
+    typeof params.expiresInSecond === 'number' &&
+    params.expiresInSecond > 0 &&
+    params.expiresInSecond < expiresInSecond
+  ) {
+    expiresInSecond = params.expiresInSecond;
+  }
+
+  const token = makeJWT(user.id, expiresInSecond, config.jwt.secret);
+
   const userResonse: SignInResponse = {
     id: user.id,
-    email: user.email,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    email: user.email,
+    token: token,
   };
 
   respondWithJson(res, 200, userResonse);
