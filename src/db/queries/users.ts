@@ -7,6 +7,16 @@ export async function createUser(newUser: NewUser) {
   return result;
 }
 
+export async function updateUser(userId: string, email: string, hashedPassword: string) {
+  const [result] = await db
+    .update(users)
+    .set({ email: email, hashedPassword: hashedPassword })
+    .where(eq(users.id, userId))
+    .returning();
+
+  return result;
+}
+
 export async function deleteUsers() {
   await db.delete(users);
 }

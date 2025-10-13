@@ -29,7 +29,7 @@ export function getBearerToken(req: Request): string {
   const authHeader = req.get('Authorization');
 
   if (!authHeader) {
-    throw new BadRequestError('Malformed authorization header');
+    throw new UnauthorizedError('Malformed authorization header');
   }
 
   const token = authHeader.trim().split(' ');

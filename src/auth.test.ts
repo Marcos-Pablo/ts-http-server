@@ -92,6 +92,6 @@ describe('getBearerToken', () => {
     const req = {
       get: (_: string) => '',
     } as Request;
-    expect(() => getBearerToken(req)).toThrow(BadRequestError);
+    expect(() => getBearerToken(req)).toThrow(UnauthorizedError);
   });
 });
