@@ -8,6 +8,13 @@
       "when": 1760316471793,
       "tag": "0000_typical_mephisto",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1760374335842,
+      "tag": "0001_plain_logan",
+      "breakpoints": true
     }
   ]
 }

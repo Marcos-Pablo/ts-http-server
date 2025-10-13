@@ -36,6 +36,7 @@ export async function handlerCreateUser(req: Request, res: Response) {
     email: user.email,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    isChirpyRed: user.isChirpyRed,
   };
 
   respondWithJson(res, 201, userResonse);
@@ -64,13 +65,14 @@ export async function handlerUpdateUser(req: Request, res: Response) {
     throw new Error('Could not update user');
   }
 
-  const userResonse: UserResponse = {
+  const userResponse: UserResponse = {
     id: user.id,
     email: user.email,
     createdAt: user.createdAt,
     updatedAt: user.updatedAt,
+    isChirpyRed: user.isChirpyRed,
   };
 
-  respondWithJson(res, 200, userResonse);
+  respondWithJson(res, 200, userResponse);
   return;
 }
