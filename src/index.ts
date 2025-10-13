@@ -2,7 +2,7 @@ import express from 'express';
 import { handlerReadiness } from './api/readiness.js';
 import { handlerApiMetrics } from './api/metrics.js';
 import { errorHandlingMidleware, middlewareLogResponse, middlewareMetricInc } from './api/middlewares.js';
-import { handlerCreateChirp, handlerGetChirpById, handlerGetChirps } from './api/chirps.js';
+import { handlerCreateChirp, handlerDeleteChirpById, handlerGetChirpById, handlerGetChirps } from './api/chirps.js';
 import postgres from 'postgres';
 import { migrate } from 'drizzle-orm/postgres-js/migrator';
 import { drizzle } from 'drizzle-orm/postgres-js';
@@ -41,6 +41,10 @@ app.get('/api/chirps', (req, res, next) => {
 
 app.get('/api/chirps/:chirpId', (req, res, next) => {
   Promise.resolve(handlerGetChirpById(req, res).catch(next));
+});
+
+app.delete('/api/chirps/:chirpId', (req, res, next) => {
+  Promise.resolve(handlerDeleteChirpById(req, res).catch(next));
 });
 
 app.post('/api/users', (req, res, next) => {
