@@ -5,22 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1759863287807,
-      "tag": "0000_redundant_freak",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1759888953837,
-      "tag": "0001_classy_sally_floyd",
-      "breakpoints": true
-    },
-    {
-      "idx": 2,
-      "version": "7",
-      "when": 1760028692246,
-      "tag": "0002_adorable_proudstar",
+      "when": 1760316471793,
+      "tag": "0000_typical_mephisto",
       "breakpoints": true
     }
   ]

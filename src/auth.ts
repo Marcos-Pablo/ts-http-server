@@ -2,9 +2,10 @@ import argon2 from 'argon2';
 import jwt, { JwtPayload } from 'jsonwebtoken';
 import { BadRequestError, UnauthorizedError } from './api/errors';
 import { Request } from 'express';
+import { config } from './config';
+import { randomBytes } from 'crypto';
 
 type Payload = Pick<JwtPayload, 'iss' | 'sub' | 'iat' | 'exp'>;
-const TOKEN_ISSUER = 'chirpy';
 
 export async function hashPassword(password: string): Promise<string> {
   const hashedPassword = argon2.hash(password);
@@ -18,6 +19,10 @@ export async function checkPasswordHash(password: string, hash: string): Promise
   } catch {
     return false;
   }
+}
+
+export function makeRefreshToken() {
+  return randomBytes(32).toString('hex');
 }
 
 export function getBearerToken(req: Request): string {
@@ -41,7 +46,7 @@ export function makeJWT(userId: string, expiresIn: number, secret: string): stri
   const expiresAt = issuedAt + expiresIn;
 
   const payload = {
-    iss: TOKEN_ISSUER,
+    iss: config.jwt.issuer,
     sub: userId,
     iat: issuedAt,
     exp: expiresAt,
@@ -59,7 +64,7 @@ export function validateJWT(tokenString: string, secret: string) {
     throw new UnauthorizedError('Invalid token');
   }
 
-  if (decoded.iss !== TOKEN_ISSUER) {
+  if (decoded.iss !== config.jwt.issuer) {
     throw new UnauthorizedError('Invalid issuer');
   }
 

@@ -21,6 +21,7 @@ type JWTConfig = {
   defaultDuration: number;
   secret: string;
   issuer: string;
+  refreshDuration: number;
 };
 
 process.loadEnvFile();
@@ -41,6 +42,7 @@ export const config: Config = {
     defaultDuration: Number(envOrThrow('JWT_DEFAULT_DURATION')),
     secret: envOrThrow('JWT_SECRET'),
     issuer: envOrThrow('JWT_ISSUER'),
+    refreshDuration: Number(envOrThrow('JWT_REFRESH_DURATION')),
   },
 };
 
