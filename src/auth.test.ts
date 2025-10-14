@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeAll } from 'vitest';
-import { hashPassword, checkPasswordHash, makeJWT, validateJWT, getBearerToken } from './auth';
+import { hashPassword, checkPasswordHash, makeJWT, validateJWT, getBearerToken, getApiKey } from './auth';
 import { BadRequestError, UnauthorizedError } from './api/errors.js';
 import { Request } from 'express';
 
@@ -84,6 +84,38 @@ describe('getBearerToken', () => {
     const token = 'mySecretToken';
     const req = {
       get: (_: string) => `Basic ${token}`,
+    } as Request;
+    expect(() => getBearerToken(req)).toThrow(BadRequestError);
+  });
+
+  it('should throw a BadRequestError if the header is an empty string', () => {
+    const req = {
+      get: (_: string) => '',
+    } as Request;
+    expect(() => getBearerToken(req)).toThrow(UnauthorizedError);
+  });
+});
+
+describe('getApiKey', () => {
+  it('should extract the api key from a valid header', () => {
+    const key = 'mySecretKey';
+    const req = {
+      get: (_: string) => `ApiKey ${key}`,
+    } as Request;
+    expect(getApiKey(req)).toBe(key);
+  });
+
+  it('should throw a BadRequestError if the header does not contain at least two parts', () => {
+    const req = {
+      get: (_: string) => 'ApiKey ',
+    } as Request;
+    expect(() => getBearerToken(req)).toThrow(BadRequestError);
+  });
+
+  it('should throw a BadRequestError if the header does not start with "ApiKey"', () => {
+    const key = 'mySecretKey';
+    const req = {
+      get: (_: string) => `Basic ${key}`,
     } as Request;
     expect(() => getBearerToken(req)).toThrow(BadRequestError);
   });

@@ -41,6 +41,22 @@ export function getBearerToken(req: Request): string {
   return token[1];
 }
 
+export function getApiKey(req: Request) {
+  const authHeader = req.get('Authorization');
+
+  if (!authHeader) {
+    throw new UnauthorizedError('Malformed authorization header');
+  }
+
+  const token = authHeader.trim().split(' ');
+
+  if (token.length != 2 || token[0] !== 'ApiKey') {
+    throw new BadRequestError('Malformed authorization header');
+  }
+
+  return token[1];
+}
+
 export function makeJWT(userId: string, expiresIn: number, secret: string): string {
   const issuedAt = Math.floor(Date.now() / 1000);
   const expiresAt = issuedAt + expiresIn;

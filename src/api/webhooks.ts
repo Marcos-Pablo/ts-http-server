@@ -1,6 +1,8 @@
 import { Request, Response } from 'express';
-import { BadRequestError, NotFoundError } from './errors';
+import { BadRequestError, NotFoundError, UnauthorizedError } from './errors';
 import { markAsRedById } from 'src/db/queries/users';
+import { getApiKey } from 'src/auth';
+import { config } from 'src/config';
 
 export async function handlerWebhook(req: Request, res: Response) {
   type Parameters = {
@@ -9,6 +11,11 @@ export async function handlerWebhook(req: Request, res: Response) {
       userId: string;
     };
   };
+
+  const apiKey = getApiKey(req);
+  if (apiKey !== config.api.polkaKey) {
+    throw new UnauthorizedError('Invalid api key');
+  }
 
   const params = req.body as Parameters;
   const { event, data } = params ?? {};
