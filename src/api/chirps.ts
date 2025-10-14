@@ -8,8 +8,15 @@ import { config } from 'src/config';
 
 const MAX_CHIRP_LENGTH = 140;
 
-export async function handlerGetChirps(_: Request, res: Response) {
-  const chirps = await getChirps();
+export async function handlerGetChirps(req: Request, res: Response) {
+  const authorId = typeof req.query.authorId === 'string' ? req.query.authorId : undefined;
+
+  let sort: 'asc' | 'desc' = 'asc';
+  if (req.query.sort === 'desc') {
+    sort = req.query.sort;
+  }
+
+  const chirps = await getChirps(authorId, sort);
 
   if (!chirps) {
     throw new Error('Could not get chirps');
